@@ -16,3 +16,4 @@ Example of a simple CRUD application with ZIO.
 5. ZIO Config
 6. ZIO Logging
 7. ZIO JSON
+8. ZIO Streams
