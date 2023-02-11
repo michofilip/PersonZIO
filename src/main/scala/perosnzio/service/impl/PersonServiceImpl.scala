@@ -31,6 +31,7 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
 
     override def create(personForm: PersonForm): Task[Person] = {
         ZIO.succeed(personForm)
+            .flatMap(PersonForm.validatePersonForm)
             .map(PersonEntity.from)
             .flatMap(personRepository.save)
             .map(Person.from)
@@ -39,6 +40,7 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
     override def update(id: Int, personForm: PersonForm): Task[Person] = {
         for
             personEntity <- getById(id)
+            personForm <- PersonForm.validatePersonForm(personForm)
             personEntityUpdated <- personRepository.save(personEntity.updated(personForm))
         yield Person.from(personEntityUpdated)
     } @@ Log.timed("PersonServiceImpl::update")
