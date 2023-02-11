@@ -7,6 +7,7 @@ import perosnzio.exceptions.NotFoundException
 import perosnzio.form.PersonForm
 import perosnzio.service.PersonService
 import perosnzio.utils.Log
+import zio.stream.{ZPipeline, ZSink}
 import zio.{Task, ZIO, ZLayer}
 
 case class PersonServiceImpl(private val personRepository: PersonRepository) extends PersonService {
@@ -16,6 +17,13 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
             people <- personRepository.findAll
         yield people.map(personFrom)
     } @@ Log.timed("PersonServiceImpl::findAll")
+
+    override def findAllStream: Task[Seq[Person]] = {
+        personRepository.findAllStream
+            .via(ZPipeline.map(personFrom))
+            .run(ZSink.collectAll)
+    } @@ Log.timed("PersonServiceImpl::findAllStream")
+
 
     override def findById(id: Int): Task[Person] = {
         getById(id).map(personFrom)
@@ -41,7 +49,7 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
         case None => ZIO.fail(NotFoundException(s"Person id: $id not found"))
     }
 
-    private def personFrom(personEntity: PersonEntity) =
+    private def personFrom(personEntity: PersonEntity): Person =
         Person(personEntity.id, personEntity.name, personEntity.age)
 }
 

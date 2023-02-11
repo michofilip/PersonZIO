@@ -6,6 +6,7 @@ import perosnzio.db.Schema.given
 import perosnzio.db.model.PersonEntity
 import perosnzio.db.repository.PersonRepository
 import zio.*
+import zio.stream.ZStream
 
 import java.sql.SQLException
 import javax.sql.DataSource
@@ -15,6 +16,10 @@ case class PersonRepositoryImpl(private val dataSource: DataSource)
         with PersonRepository {
 
     override def findAll: Task[Seq[PersonEntity]] = run {
+        query[PersonEntity]
+    }.provideEnvironment(ZEnvironment(dataSource))
+
+    override def findAllStream: ZStream[Any, Throwable, PersonEntity] = stream {
         query[PersonEntity]
     }.provideEnvironment(ZEnvironment(dataSource))
 
