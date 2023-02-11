@@ -15,28 +15,32 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
     override def findAll: Task[Seq[Person]] = {
         for
             people <- personRepository.findAll
-        yield people.map(personFrom)
+        yield people.map(Person.from)
     } @@ Log.timed("PersonServiceImpl::findAll")
 
     override def findAllStream: Task[Seq[Person]] = {
         personRepository.findAllStream
-            .via(ZPipeline.map(personFrom))
+            .via(ZPipeline.map(Person.from))
             .run(ZSink.collectAll)
     } @@ Log.timed("PersonServiceImpl::findAllStream")
 
 
     override def findById(id: Int): Task[Person] = {
-        getById(id).map(personFrom)
+        getById(id).map(Person.from)
     } @@ Log.timed("PersonServiceImpl::findById")
 
-    override def create(personForm: PersonForm): Task[Person] =
-        personRepository.save(PersonEntity.from(personForm)).map(personFrom) @@ Log.timed("PersonServiceImpl::create")
+    override def create(personForm: PersonForm): Task[Person] = {
+        ZIO.succeed(personForm)
+            .map(PersonEntity.from)
+            .flatMap(personRepository.save)
+            .map(Person.from)
+    } @@ Log.timed("PersonServiceImpl::create")
 
     override def update(id: Int, personForm: PersonForm): Task[Person] = {
         for
             personEntity <- getById(id)
             personEntityUpdated <- personRepository.save(personEntity.updated(personForm))
-        yield personFrom(personEntityUpdated)
+        yield Person.from(personEntityUpdated)
     } @@ Log.timed("PersonServiceImpl::update")
 
     override def delete(id: Int): Task[Unit] = for
@@ -49,8 +53,6 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
         case None => ZIO.fail(NotFoundException(s"Person id: $id not found"))
     }
 
-    private def personFrom(personEntity: PersonEntity): Person =
-        Person(personEntity.id, personEntity.name, personEntity.age)
 }
 
 
