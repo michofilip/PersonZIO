@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
             "io.getquill" %% "quill-jdbc-zio" % quillVersion,
             "org.postgresql" % "postgresql" % postgresqlVersion,
 
-            "org.slf4j" % "slf4j-simple" % slf4jVersion,
+            "org.slf4j" % "slf4j-simple" % slf4jVersion
         ),
         testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
     )
