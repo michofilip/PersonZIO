@@ -7,6 +7,8 @@ import zio.{Task, ZIO}
 trait PersonService {
     def findAll: Task[Seq[Person]]
 
+    def findAllStream: Task[Seq[Person]]
+
     def findById(id: Int): Task[Person]
 
     def create(personForm: PersonForm): Task[Person]
