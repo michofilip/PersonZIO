@@ -10,7 +10,7 @@ case class PersonForm(name: String, age: Int)
 object PersonForm {
     given JsonCodec[PersonForm] = DeriveJsonCodec.gen
 
-    def validatePersonForm(personForm: PersonForm): IO[ValidationException, PersonForm] =
+    def validate(personForm: PersonForm): IO[ValidationException, PersonForm] =
         ZValidation.validateWith(
             validateName(personForm.name),
             validateAge(personForm.age)
