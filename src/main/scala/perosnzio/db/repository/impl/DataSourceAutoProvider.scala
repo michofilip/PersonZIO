@@ -1,14 +1,15 @@
 package perosnzio.db.repository.impl
 
 import zio.stream.ZStream
-import zio.{Task, ZEnvironment, ZIO}
+import zio.{Task, ZEnvironment, ZIO, ZLayer}
 
+import java.sql.SQLException
 import javax.sql.DataSource
 import javax.xml.transform.stream.StreamResult
 import scala.Conversion
 
 trait DataSourceAutoProvider(dataSource: DataSource) {
-    given[T]: Conversion[ZIO[DataSource, Any, T], Task[T]] = _.provideEnvironment(ZEnvironment(dataSource))
+    inline given[T]: Conversion[ZIO[DataSource, SQLException, T], Task[T]] = _.provideLayer(ZLayer.succeed(dataSource))
 
-    given[T]: Conversion[ZStream[DataSource, Any, T], ZStream[Any, Throwable, T]] = _.provideEnvironment(ZEnvironment(dataSource))
+    inline given[T]: Conversion[ZStream[DataSource, SQLException, T], ZStream[Any, Throwable, T]] = _.provideLayer(ZLayer.succeed(dataSource))
 }

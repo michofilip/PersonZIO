@@ -23,7 +23,6 @@ case class PersonRepositoryImpl(private val dataSource: DataSource)
     override def findAllStream: ZStream[Any, Throwable, PersonEntity] = stream {
         query[PersonEntity]
     }
-//        .provideEnvironment(ZEnvironment(dataSource))
 
     override def findById(id: Int): Task[Option[PersonEntity]] = run {
         query[PersonEntity].filter(p => p.id == lift(id))
