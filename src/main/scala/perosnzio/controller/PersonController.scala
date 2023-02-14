@@ -12,9 +12,9 @@ case class PersonController(private val personService: PersonService) {
     private val path = !! / "people"
 
     def routes = Http.collectZIO[Request] {
-        case Method.GET -> path => personService.findAll.toJsonResponse
-
         case Method.GET -> path / "stream" => personService.findAllStream.toJsonResponse
+
+        case Method.GET -> path => personService.findAll.toJsonResponse
 
         case Method.GET -> path / id => personService.findById(id.toInt).toJsonResponse
 
