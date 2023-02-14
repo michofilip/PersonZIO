@@ -13,19 +13,20 @@ import javax.sql.DataSource
 
 case class PersonRepositoryImpl(private val dataSource: DataSource)
     extends PostgresZioJdbcContext(SnakeCase)
-        with PersonRepository {
+        with PersonRepository
+        with DataSourceAutoProvider(dataSource) {
 
     override def findAll: Task[Seq[PersonEntity]] = run {
         query[PersonEntity]
-    }.provideEnvironment(ZEnvironment(dataSource))
+    }
 
     override def findAllStream: ZStream[Any, Throwable, PersonEntity] = stream {
         query[PersonEntity]
-    }.provideEnvironment(ZEnvironment(dataSource))
+    }
 
     override def findById(id: Int): Task[Option[PersonEntity]] = run {
         query[PersonEntity].filter(p => p.id == lift(id))
-    }.map(_.headOption).provideEnvironment(ZEnvironment(dataSource))
+    }.map(_.headOption)
 
     override def save(personEntity: PersonEntity): Task[PersonEntity] = {
         if (personEntity.id == 0) {
@@ -33,11 +34,11 @@ case class PersonRepositoryImpl(private val dataSource: DataSource)
         } else {
             run(update(lift(personEntity)))
         }
-    }.provideEnvironment(ZEnvironment(dataSource))
+    }
 
-    override def delete(id: Int): ZIO[Any, SQLException, Long] = run {
+    override def delete(id: Int): Task[Long] = run {
         query[PersonEntity].filter(p => p.id == lift(id)).delete
-    }.provideEnvironment(ZEnvironment(dataSource))
+    }
 
     private inline def insert = quote { (personEntity: PersonEntity) =>
         query[PersonEntity].insertValue(personEntity).returning(p => p)
@@ -46,6 +47,7 @@ case class PersonRepositoryImpl(private val dataSource: DataSource)
     private inline def update = quote { (personEntity: PersonEntity) =>
         query[PersonEntity].filter(p => p.id == personEntity.id).updateValue(personEntity).returning(p => p)
     }
+
 }
 
 object PersonRepositoryImpl {
