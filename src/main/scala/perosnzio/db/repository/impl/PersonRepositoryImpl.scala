@@ -4,17 +4,17 @@ import io.getquill.*
 import io.getquill.jdbczio.Quill
 import perosnzio.db.Schema.given
 import perosnzio.db.model.PersonEntity
-import perosnzio.db.repository.PersonRepository
+import perosnzio.db.repository.{DataSourceAutoProvider, PersonRepository}
 import zio.*
 import zio.stream.ZStream
 
 import java.sql.SQLException
 import javax.sql.DataSource
 
-case class PersonRepositoryImpl(private val dataSource: DataSource)
+case class PersonRepositoryImpl(override protected val dataSource: DataSource)
     extends PostgresZioJdbcContext(SnakeCase)
         with PersonRepository
-        with DataSourceAutoProvider(dataSource) {
+        with DataSourceAutoProvider {
 
     override def findAll: Task[Seq[PersonEntity]] = run {
         query[PersonEntity]
@@ -51,5 +51,5 @@ case class PersonRepositoryImpl(private val dataSource: DataSource)
 }
 
 object PersonRepositoryImpl {
-    lazy val layer = ZLayer.fromFunction(PersonRepositoryImpl.apply _)
+    lazy val layer = ZLayer.derive[PersonRepositoryImpl]
 }
