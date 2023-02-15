@@ -3,7 +3,7 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.example"
 ThisBuild / organizationName := "example"
 
-val zioVersion = "2.0.8"
+val zioVersion = "2.0.9"
 val zioHTTPVersion = "0.0.4"
 val zioJsonVersion = "0.4.2"
 val quillVersion = "4.6.0"
