@@ -26,5 +26,5 @@ case class PersonController(private val personService: PersonService)
 }
 
 object PersonController {
-    lazy val layer = ZLayer.fromFunction(apply _)
+    lazy val layer = ZLayer.derive[PersonController]
 }

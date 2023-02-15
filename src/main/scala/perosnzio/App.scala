@@ -19,7 +19,7 @@ case class App(private val personController: PersonController) {
 }
 
 object App {
-    lazy val layer = ZLayer.fromFunction(App.apply _)
+    lazy val layer = ZLayer.derive[App]
 
     def start: ZIO[App & Server, Nothing, Unit] = ZIO.serviceWithZIO[App](_.start)
 }

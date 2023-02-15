@@ -59,5 +59,5 @@ case class PersonServiceImpl(private val personRepository: PersonRepository) ext
 
 
 object PersonServiceImpl {
-    lazy val layer = ZLayer.fromFunction(PersonServiceImpl.apply _)
+    lazy val layer = ZLayer.derive[PersonServiceImpl]
 }
