@@ -9,7 +9,7 @@ val zioJsonVersion = "0.4.2"
 val quillVersion = "4.6.0"
 val zioLoggingVersion = "2.1.9"
 val zioConfigVersion = "3.0.7"
-val postgresqlVersion = "42.5.3"
+val postgresqlVersion = "42.5.4"
 val slf4jVersion = "2.0.5"
 
 lazy val root = (project in file("."))
